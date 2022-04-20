@@ -2,104 +2,148 @@ import 'dart:core';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:select_form_field/select_form_field.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:snozzy/CustomWidgets/MainDrawer.dart';
 import 'package:snozzy/Globals.dart';
-import 'package:snozzy/services/Analytics.dart';
-import 'package:snozzy/services/Database.dart';
+import 'package:snozzy/models/SnoozyTypes.dart';
 
-//לערוך שעות של דיאלוג
-//דברים של נותיפיקציות
+import '../services/Database.dart';
+import '../services/SPService.dart';
 
 class SettingsPage extends StatelessWidget {
-  static Map<String, Duration?> deleteTimeOptions = {
-    'never': null,
-    'One year': Duration(days: 365),
-    'One month': Duration(days: 31),
-    'One week': Duration(days: 7)
-  };
-
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: SharedPreferences.getInstance(),
-      builder:
-          // ignore: missing_return
-          (BuildContext context, AsyncSnapshot<SharedPreferences> value) {
-        if (value.connectionState == ConnectionState.waiting)
-          return CircularProgressIndicator();
-        if (value.connectionState == ConnectionState.done) {
-          SharedPreferences? sharedPreferences = value.data;
-          return Scaffold(
-              appBar: AppBar(
-                centerTitle: true,
-                title: Text(
-                  'Settings',
-                  style: TextStyle(
-                    color: Globals.strongGray,
-                  ),
-                ),
-              ),
-              drawer: MainDrawer(CurrentPage.Setting),
-              body: ListView(
-                children: [
-                  Card(
-                      child: DeleteFromHistory(sharedPreferences!),
-                      elevation: 4),
-                  /*Card(
+    return Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          title: Text(
+            'Settings',
+            style: TextStyle(
+              color: Globals.strongGray,
+            ),
+          ),
+        ),
+        drawer: MainDrawer(CurrentPage.Setting),
+        body: ListView(
+          children: [
+            AutoDeleteHistoryCard(),
+            WorkWeekCard(),
+            /*Card(
                       child: LeaveAppOpenAfterShareWidget(sharedPreferences),
                       elevation: 8)*/
-                ],
-              ));
-        }
-        return Container();
-      },
-    );
+          ],
+        ));
   }
 }
 
-class DeleteFromHistory extends StatelessWidget {
-  SharedPreferences sharedPreferences;
+class AutoDeleteHistoryCard extends StatefulWidget {
+  @override
+  State<AutoDeleteHistoryCard> createState() => _AutoDeleteHistoryCardState();
+}
 
-  DeleteFromHistory(this.sharedPreferences);
-
+class _AutoDeleteHistoryCardState extends State<AutoDeleteHistoryCard> {
   @override
   Widget build(BuildContext context) {
-    return SelectFormField(
-      labelText: 'Items will be deleted from history after:',
-      initialValue: sharedPreferences.containsKey('deleteFromHistory')
-          ? sharedPreferences.getString('deleteFromHistory')
-          : 'Never',
-      items: [
-        {
-          'value': 'Never',
-          'label': 'Never',
-        },
-        {
-          'value': 'One year',
-          'label': 'One year',
-        },
-        {
-          'value': 'One month',
-          'label': 'One month',
-        },
-        {
-          'value': 'One week',
-          'label': 'One week',
-        },
-      ],
-      onChanged: (val) {
-        Analytics.settingsAutoDeleteFromHistory(val);
-        Database.deleteFromHistoryDuration =
-            SettingsPage.deleteTimeOptions[val];
-        sharedPreferences.setString('deleteFromHistory', val);
-      },
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Card(
+        elevation: 2,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Items will automatically delete from history"),
+            DropdownButton<AutoDeleteHistoryType>(
+                value: SPService().currentAutoDeleteHistoryType,
+                isExpanded: true,
+                iconSize: 30,
+                underline: Container(),
+                items: [
+                  DropdownMenuItem<AutoDeleteHistoryType>(
+                    child: Text('Never'),
+                    value: AutoDeleteHistoryType.never,
+                  ),
+                  DropdownMenuItem<AutoDeleteHistoryType>(
+                    child: Text('Once a year'),
+                    value: AutoDeleteHistoryType.one_year,
+                  ),
+                  DropdownMenuItem<AutoDeleteHistoryType>(
+                    child: Text('Once a month'),
+                    value: AutoDeleteHistoryType.one_month,
+                  ),
+                  DropdownMenuItem<AutoDeleteHistoryType>(
+                    child: Text('Once a week'),
+                    value: AutoDeleteHistoryType.one_week,
+                  ),
+                ],
+                onChanged: (AutoDeleteHistoryType? type) {
+                  Database.deleteFromHistoryDuration = type!.value;
+                  setState(() {
+                    SPService().currentAutoDeleteHistoryType = type;
+                  });
+                }),
+          ],
+        ),
+      ),
     );
   }
 }
 
-class LeaveAppOpenAfterShareWidget extends StatefulWidget {
+class WorkWeekCard extends StatefulWidget {
+  WorkWeekCard({Key? key}) : super(key: key);
+
+  @override
+  State<WorkWeekCard> createState() => _WorkWeekCardState();
+}
+
+class _WorkWeekCardState extends State<WorkWeekCard> {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Card(
+        elevation: 2,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('my work week'),
+            DropdownButton<WorkWeekType>(
+                value: SPService().currentWorkWeekType,
+                isExpanded: true,
+                iconSize: 30,
+                underline: Container(),
+                items: [
+                  DropdownMenuItem<WorkWeekType>(
+                    child: Text(
+                      "Monday-Friday",
+                    ),
+                    value: WorkWeekType.mon_fri,
+                  ),
+                  DropdownMenuItem<WorkWeekType>(
+                    child: Text(
+                      "Sunday-Thursday",
+                    ),
+                    value: WorkWeekType.sun_thu,
+                  )
+                ],
+                onChanged: (WorkWeekType? type) {
+                  //Analytics.settingsAutoDeleteFromHistory(val);
+                  if (type == null) {
+                    print("WorkWeekType is null");
+                    return;
+                  }
+                  setState(() {
+                    SPService().currentWorkWeekType = type;
+                  });
+                }),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/*class LeaveAppOpenAfterShareWidget extends StatefulWidget {
   SharedPreferences sharedPreferences;
 
   LeaveAppOpenAfterShareWidget(this.sharedPreferences);
@@ -126,3 +170,4 @@ class _LeaveAppOpenAfterShareWidgetState
     );
   }
 }
+*/

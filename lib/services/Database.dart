@@ -87,8 +87,7 @@ class Database {
 
   static void updateSnoozedList() {
     for (SharedItem item in Database.getItems(Database.sharesList).values) {
-      if (item.reminderTime == null ||
-          item.reminderTime.isBefore(DateTime.now())) {
+      if (item.reminderTime.isBefore(DateTime.now())) {
         item.delete();
         addSharedItem(Database.snoozedList, item);
       }

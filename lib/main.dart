@@ -5,21 +5,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:snozzy/Globals.dart';
 import 'package:snozzy/models/SharedItem.dart';
+import 'package:snozzy/models/SnoozyTypes.dart';
 import 'package:snozzy/services/Analytics.dart';
+import 'package:snozzy/services/SPService.dart';
 
 import 'services/Database.dart';
 import 'Pages/MainListPage.dart';
 
-//define work week from settings (weekend is friday or saturday)
-//leave app open after share (control from settings)
-//add custom time options (also edit from settings)
-//settings arrow not doing anything
-//custom time option: customize icon, delete option
+//add multi-language support
+//settings: arrow not doing anything, edit time options, leave app open after share, define work week, control notifications
+//custom time option: customize icon, delete option (fix)
+//implement new settings
+//clean up routing
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  DateTime startTime = DateTime.now();
   await Firebase.initializeApp();
   await Database.databaseInit();
+  await SPService().init();
 
   AwesomeNotifications().initialize(null, [
     NotificationChannel(
@@ -30,8 +32,6 @@ void main() async {
         ledColor: Colors.white)
   ]);
 
-  print(
-      'time before runapp:' + startTime.difference(DateTime.now()).toString());
   runApp(MyApp());
 }
 

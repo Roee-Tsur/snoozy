@@ -6,7 +6,10 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:snozzy/Globals.dart';
 import 'package:intl/intl.dart';
 import 'package:snozzy/models/CustomTimeOption.dart';
+import 'package:snozzy/models/SnoozyTypes.dart';
 import 'package:snozzy/services/Database.dart';
+
+import '../services/SPService.dart';
 
 class TimePickerDialog extends StatefulWidget {
   _TimePickerDialogState createState() => _TimePickerDialogState();
@@ -55,18 +58,19 @@ class _TimePickerDialogState extends State<TimePickerDialog> {
         value: combineDateAndTime(now, TimeOfDay(minute: 0, hour: 19)),
         onTap: (value, context) => save(value, context));
 
+    final workWeek = SPService().currentWorkWeekType;
     _TimeOption thisWeekend = _TimeOption(
         icon: Icons.weekend,
         title: 'This weekend',
-        subTitle: 'Fri 10:00',
-        value: setDayOfTheWeek(now, 5, 10),
+        subTitle: '${workWeek.thisWeekendShortName} 10:00',
+        value: setDayOfTheWeek(now, workWeek.thisWeekendDay, 10),
         onTap: (value, context) => save(value, context));
 
     _TimeOption nextWeek = _TimeOption(
         icon: Icons.next_week,
         title: 'Next week',
-        subTitle: 'Sun 8:00',
-        value: setDayOfTheWeek(now, 7, 8),
+        subTitle: '${workWeek.nextWeekShortName} 8:00',
+        value: setDayOfTheWeek(now, workWeek.nextWeekDay, 8),
         onTap: (value, context) => save(value, context));
 
     Widget addCustomTimeOption = InkWell(
