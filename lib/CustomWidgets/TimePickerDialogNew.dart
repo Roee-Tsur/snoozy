@@ -22,8 +22,8 @@ class _TimePickerDialogState extends State<TimePickerDialog> {
       elevation: 12,
       child: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.only(
-              top: 15, bottom: 15, left: 25.0, right: 25),
+          padding:
+              const EdgeInsets.only(top: 15, bottom: 15, left: 25.0, right: 25),
           child: GridView.count(
             physics: ScrollPhysics(),
             shrinkWrap: true,
@@ -200,36 +200,35 @@ class _TimeOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) => InkWell(
       onTap: () => onTap(value, context),
-      onLongPress: customId != null
-          ? () => showMenu(
-                  context: context,
-                  position: RelativeRect.fromLTRB(25.0, 25.0, 0.0, 0.0),
-                  items: [
-                    PopupMenuItem(
-                      child: Text("delete"),
-                      onTap: () {
-                        onDelete!.call();
-                      },
-                    )
-                  ])
-          : null,
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              color: Globals.snoozyPurple,
+      child: Stack(
+        children: [
+          customId != null
+              ? Align(
+                  alignment: Alignment.topRight,
+                  child: IconButton(
+                      onPressed: () => onDelete!.call(),
+                      icon: Icon(Icons.remove)),
+                )
+              : Container(),
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  color: Globals.snoozyPurple,
+                ),
+                ListTile(
+                  title: Text(
+                    title,
+                    textAlign: TextAlign.center,
+                  ),
+                  subtitle: Text(subTitle, textAlign: TextAlign.center),
+                )
+              ],
             ),
-            ListTile(
-              title: Text(
-                title,
-                textAlign: TextAlign.center,
-              ),
-              subtitle: Text(subTitle, textAlign: TextAlign.center),
-            )
-          ],
-        ),
+          ),
+        ],
       ));
 }
 
@@ -363,41 +362,49 @@ class _CustomTimeOptionDialogState extends State<CustomTimeOptionDialog> {
             Container(
               height: 8,
             ),
-            TextFormField(
-                controller: _hoursController,
-                decoration: InputDecoration(
-                    hintText: "0",
-                    labelText: "hours",
-                    border: OutlineInputBorder()),
-                keyboardType: TextInputType.numberWithOptions(
-                    decimal: false, signed: false),
-                validator: (value) {
-                  if (value == null || value.isEmpty) value = "0";
-                  int intValue = int.parse(value);
-                  if (intValue < 0) {
-                    return "please enter a positive number";
-                  }
-                  return null;
-                }),
-            Container(
-              height: 8,
+            Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                      controller: _hoursController,
+                      decoration: InputDecoration(
+                          hintText: "0",
+                          labelText: "hours",
+                          border: OutlineInputBorder()),
+                      keyboardType: TextInputType.numberWithOptions(
+                          decimal: false, signed: false),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) value = "0";
+                        int intValue = int.parse(value);
+                        if (intValue < 0) {
+                          return "please enter a positive number";
+                        }
+                        return null;
+                      }),
+                ),
+                Container(
+                  width: 8,
+                ),
+                Expanded(
+                  child: TextFormField(
+                      controller: _minutesController,
+                      decoration: InputDecoration(
+                          hintText: "0",
+                          labelText: "minutes",
+                          border: OutlineInputBorder()),
+                      keyboardType: TextInputType.numberWithOptions(
+                          decimal: false, signed: false),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) value = "0";
+                        int intValue = int.parse(value);
+                        if (intValue < 0) {
+                          return "please enter a positive number";
+                        }
+                        return null;
+                      }),
+                ),
+              ],
             ),
-            TextFormField(
-                controller: _minutesController,
-                decoration: InputDecoration(
-                    hintText: "0",
-                    labelText: "minutes",
-                    border: OutlineInputBorder()),
-                keyboardType: TextInputType.numberWithOptions(
-                    decimal: false, signed: false),
-                validator: (value) {
-                  if (value == null || value.isEmpty) value = "0";
-                  int intValue = int.parse(value);
-                  if (intValue < 0) {
-                    return "please enter a positive number";
-                  }
-                  return null;
-                }),
             Align(
               alignment: Alignment.centerRight,
               child: TextButton(

@@ -50,7 +50,7 @@ class _AutoDeleteHistoryCardState extends State<AutoDeleteHistoryCard> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+          children: [//todo add auto delete icon
             Text("Items will automatically delete from history"),
             DropdownButton<AutoDeleteHistoryType>(
                 value: SPService().currentAutoDeleteHistoryType,
