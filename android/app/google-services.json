@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "82503511702",
+    "firebase_url": "https://snoozy-9295f.firebaseio.com",
+    "project_id": "snoozy-9295f",
+    "storage_bucket": "snoozy-9295f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:82503511702:android:951355fd05682447ee9cb7",
+        "android_client_info": {
+          "package_name": "surk.inc.snoozy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "82503511702-k9e9bebd916kuka79bavp3048v6qc60o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjrVnUtT5k_q36n_TnoqO59_bbGdttpKo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "82503511702-k9e9bebd916kuka79bavp3048v6qc60o.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "82503511702-7jp3fh0sq8img4qeapm03upbkdv73ou0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "surk.snoozy"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
