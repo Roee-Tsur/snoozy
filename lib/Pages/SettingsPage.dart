@@ -1,8 +1,8 @@
 import 'dart:core';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:snozzy/CustomWidgets/MainDrawer.dart';
+import 'package:snozzy/CustomWidgets/TimePickerDialogNew.dart' as TPD;
 import 'package:snozzy/Globals.dart';
 import 'package:snozzy/models/SnoozyTypes.dart';
 
@@ -27,9 +27,7 @@ class SettingsPage extends StatelessWidget {
           children: [
             AutoDeleteHistoryCard(),
             WorkWeekCard(),
-            /*Card(
-                      child: LeaveAppOpenAfterShareWidget(sharedPreferences),
-                      elevation: 8)*/
+            EditTimeOptionCard()
           ],
         ));
   }
@@ -50,7 +48,8 @@ class _AutoDeleteHistoryCardState extends State<AutoDeleteHistoryCard> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [//todo add auto delete icon
+          children: [
+            //todo add auto delete icon
             Text("Items will automatically delete from history"),
             DropdownButton<AutoDeleteHistoryType>(
                 value: SPService().currentAutoDeleteHistoryType,
@@ -138,6 +137,34 @@ class _WorkWeekCardState extends State<WorkWeekCard> {
                 }),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class EditTimeOptionCard extends StatefulWidget {
+  const EditTimeOptionCard({Key? key}) : super(key: key);
+
+  @override
+  State<EditTimeOptionCard> createState() => _EditTimeOptionCardState();
+}
+
+class _EditTimeOptionCardState extends State<EditTimeOptionCard> {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Card(
+        elevation: 2,
+        child: TextButton(
+            child: Text("edit time options"),
+            onPressed: () {
+              showDialog(
+                  context: context,
+                  builder: (context) => TPD.TimePickerDialog(
+                        isSettings: true,
+                      ));
+            }),
       ),
     );
   }

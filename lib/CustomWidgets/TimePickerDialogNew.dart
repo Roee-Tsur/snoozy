@@ -1,5 +1,4 @@
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -12,6 +11,12 @@ import 'package:snozzy/services/Database.dart';
 import '../services/SPService.dart';
 
 class TimePickerDialog extends StatefulWidget {
+  bool isSettings = false;
+
+  TimePickerDialog({bool? isSettings}) {
+    if (isSettings != null) this.isSettings = isSettings;
+  }
+
   _TimePickerDialogState createState() => _TimePickerDialogState();
 }
 
@@ -28,7 +33,8 @@ class _TimePickerDialogState extends State<TimePickerDialog> {
             physics: ScrollPhysics(),
             shrinkWrap: true,
             crossAxisCount: 2,
-            children: getTimeOptions(),
+            children:
+                widget.isSettings ? getSettingsTimeOptions() : getTimeOptions(),
           ),
         ),
       ),
@@ -36,6 +42,7 @@ class _TimePickerDialogState extends State<TimePickerDialog> {
   }
 
   List<Widget> getTimeOptions() {
+    final now = DateTime.now();
     _TimeOption tomorrowMorning = _TimeOption(
         icon: Icons.wb_sunny,
         title: 'Tomorrow morning',
@@ -129,11 +136,14 @@ class _TimePickerDialogState extends State<TimePickerDialog> {
     List<Widget> timeOptions = [];
     timeOptions.add(tomorrowMorning);
 
+    //shows option only before the after noon
     if (now.hour < 13) timeOptions.add(thisAfternoon);
 
+    //shows option only before the evening
     if (now.hour < 19) timeOptions.add(thisEvening);
 
-    if (now.weekday != 5 && now.weekday != 6) timeOptions.add(thisWeekend);
+    //shows option only when its now the the weekend days
+    if (!workWeek.isWeekendNow) timeOptions.add(thisWeekend);
 
     timeOptions.add(nextWeek);
     final customOptionsModels = Database.getTimeOptions();
@@ -150,7 +160,52 @@ class _TimePickerDialogState extends State<TimePickerDialog> {
     return timeOptions;
   }
 
-  static DateTime now = DateTime.now();
+  List<Widget> getSettingsTimeOptions() {
+    Widget addNewTimeOption = InkWell(
+      onTap: () async {
+        final CustomTimeOption results = await showDialog(
+            context: context,
+            builder: (BuildContext context) => CustomTimeOptionDialog());
+        setState(() {
+          Database.addTimeOption(results);
+        });
+      },
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.add,
+              color: Globals.snoozyPurple,
+            ),
+            ListTile(
+              title: Text(
+                'Add a new option',
+                textAlign: TextAlign.center,
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+
+    List<Widget> timeOptions = [];
+    final customOptionsModels = Database.getTimeOptions();
+
+    timeOptions.addAll(List.generate(
+        customOptionsModels.length,
+        (index) => _TimeOption.fromCustomTimeOption(
+              customOptionsModels[index],
+              () {
+                setState(() {
+                  Database.deleteTimeOption(customOptionsModels[index].id);
+                });
+              },
+              isSettings: true,
+            )));
+    timeOptions.add(addNewTimeOption);
+    return timeOptions;
+  }
 
   static Map<int, String> weekdayToString = {
     1: 'Mon',
@@ -186,13 +241,17 @@ class _TimeOption extends StatelessWidget {
       required this.value});
 
   _TimeOption.fromCustomTimeOption(
-      CustomTimeOption customTimeOption, Function onDelete) {
+      CustomTimeOption customTimeOption, Function onDelete,
+      {bool? isSettings}) {
     this.title = customTimeOption.title;
     this.subTitle = customTimeOption.subTitle;
     this.icon = Icons.star;
     this.value = DateTime.now().add(Duration(
         hours: customTimeOption.hours, minutes: customTimeOption.minutes));
-    this.onTap = (value, context) => save(value, context);
+    this.onTap = (value, context) {
+      if (isSettings != null && isSettings) return;
+      save(value, context);
+    };
     this.customId = customTimeOption.id;
     this.onDelete = onDelete;
   }
@@ -207,7 +266,7 @@ class _TimeOption extends StatelessWidget {
                   alignment: Alignment.topRight,
                   child: IconButton(
                       onPressed: () => onDelete!.call(),
-                      icon: Icon(Icons.remove)),
+                      icon: Icon(Icons.close)),
                 )
               : Container(),
           Center(

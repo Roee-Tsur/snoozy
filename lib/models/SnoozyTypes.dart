@@ -36,6 +36,16 @@ extension WorkWeekTypeExtension on WorkWeekType {
         return 8;
     }
   }
+
+  bool get isWeekendNow {
+    final now = DateTime.now();
+    switch (this) {
+      case WorkWeekType.sun_thu:
+        return now.weekday == 5 || now.weekday == 6;
+      case WorkWeekType.mon_fri:
+        return now.weekday == 6 || now.weekday == 7;
+    }
+  }
 }
 
 enum AutoDeleteHistoryType { never, one_year, one_month, one_week }

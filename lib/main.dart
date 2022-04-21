@@ -13,10 +13,10 @@ import 'services/Database.dart';
 import 'Pages/MainListPage.dart';
 
 //add multi-language support
-//settings: arrow not doing anything, edit time options, leave app open after share, define work week, control notifications
-//custom time option: customize icon, delete option (fix)
-//implement new settings
+//settings: leave app open after share, control notifications
+//custom time option: customize icon
 //clean up routing
+//show weekend option correct to workweek
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
