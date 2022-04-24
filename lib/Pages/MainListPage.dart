@@ -27,6 +27,8 @@ import 'package:string_validator/string_validator.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class MainListPage extends StatefulWidget {
+  static final String routeName = '/';
+
   @override
   MainListPageState createState() => MainListPageState();
 }

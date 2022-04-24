@@ -1,9 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:snozzy/Globals.dart';
 import 'package:snozzy/models/SharedItem.dart';
 
 class ItemViewerPage extends StatelessWidget {
+  static final String routeName = 'item viewer page';
+
   SharedItem sharedItem;
   BuildContext? context;
   dynamic contentWidget;

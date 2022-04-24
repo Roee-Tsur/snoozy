@@ -10,6 +10,7 @@ import '../services/Database.dart';
 import '../services/SPService.dart';
 
 class SettingsPage extends StatelessWidget {
+  static final String routeName = '/settingsPage';
   @override
   Widget build(BuildContext context) {
     return Scaffold(

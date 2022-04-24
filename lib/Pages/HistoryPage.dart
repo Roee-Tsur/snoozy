@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:snozzy/CustomWidgets/GlobalWidgets.dart';
 import 'package:snozzy/CustomWidgets/ItemWidget.dart';
@@ -18,6 +17,8 @@ import 'package:snozzy/services/Database.dart';
 import '../Globals.dart';
 
 class HistoryPage extends StatefulWidget {
+  static final String routeName = '/historyPage';
+
   State<StatefulWidget> createState() => _HistoryPageState();
 }
 

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:snozzy/Pages/HistoryPage.dart';
 import 'package:snozzy/Pages/MainListPage.dart';
@@ -8,7 +7,7 @@ import 'package:snozzy/services/Analytics.dart';
 enum CurrentPage { History, MainList, Setting }
 
 class MainDrawer extends StatelessWidget {
-  CurrentPage currentPage;
+  final CurrentPage currentPage;
 
   MainDrawer(this.currentPage);
 
@@ -30,16 +29,12 @@ class MainDrawer extends StatelessWidget {
                     ? Colors.purple.shade200
                     : Colors.white,
                 onTap: () {
-                  Navigator.pop(context);
                   if (currentPage == CurrentPage.MainList) return;
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          settings: RouteSettings(name: 'MainPage'),
-                          builder: (context) {
-                            Analytics.setCurrentScreen('MainPage');
-                            return MainListPage();
-                          }));
+                  Navigator.popUntil(
+                    context,
+                    ModalRoute.withName(MainListPage.routeName),
+                  );
+                  Analytics.setCurrentScreen('MainPage');
                 }),
           ),
           InkWell(
@@ -52,14 +47,12 @@ class MainDrawer extends StatelessWidget {
                 onTap: () {
                   Navigator.pop(context);
                   if (currentPage == CurrentPage.History) return;
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          settings: RouteSettings(name: 'HistoryPage'),
-                          builder: (context) {
-                            Analytics.setCurrentScreen('HistoryPage');
-                            return HistoryPage();
-                          }));
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    HistoryPage.routeName,
+                    ModalRoute.withName(MainListPage.routeName),
+                  );
+                  Analytics.setCurrentScreen('HistoryPage');
                 }),
           ),
           InkWell(
@@ -72,14 +65,12 @@ class MainDrawer extends StatelessWidget {
                 onTap: () {
                   Navigator.pop(context);
                   if (currentPage == CurrentPage.Setting) return;
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          settings: RouteSettings(name: 'SettingsPage'),
-                          builder: (context) {
-                            Analytics.setCurrentScreen('SettingsPage');
-                            return SettingsPage();
-                          }));
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    SettingsPage.routeName,
+                    ModalRoute.withName(MainListPage.routeName),
+                  );
+                  Analytics.setCurrentScreen('SettingsPage');
                 }),
           ),
           /*InkWell(

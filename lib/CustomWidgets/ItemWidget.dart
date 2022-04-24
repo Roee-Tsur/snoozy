@@ -184,13 +184,14 @@ class _ItemWidgetState extends State<ItemWidget> {
               builder: (BuildContext context) {
                 return TPD.TimePickerDialog();
               }).then((value) {
-            if (value != null)
+            if (value != null) {
               Analytics.newReminderTime(
                   sharedItem.typeToText(),
                   DateTime.now().isAfter(sharedItem.reminderTime),
                   DateTime.now().difference(value));
-            sharedItem.setReminderTime(value);
-            widget.parentPageState.setState(() {});
+              sharedItem.setReminderTime(value);
+              widget.parentPageState.setState(() {});
+            }
             Navigator.pop(context);
           });
         },

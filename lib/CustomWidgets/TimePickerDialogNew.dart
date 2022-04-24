@@ -221,6 +221,7 @@ class _TimePickerDialogState extends State<TimePickerDialog> {
   static DateTime setDayOfTheWeek(DateTime now, int day, int hour) {
     now = combineDateAndTime(now, TimeOfDay(hour: hour, minute: 0));
     if (now.weekday == day) now.add(Duration(days: 7));
+    if (now.weekday >= day) day += 7;
     return now.add(Duration(days: (day - now.weekday).abs()));
   }
 }
