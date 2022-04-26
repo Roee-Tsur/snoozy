@@ -15,7 +15,7 @@ import 'Pages/MainListPage.dart';
 //add multi-language support
 //settings: leave app open after share, control notifications
 //custom time option: customize icon
-
+//check restore from history
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
