@@ -93,7 +93,6 @@ class SharedItem extends HiveObject {
     return type.toString().toLowerCase().split('.')[1];
   }
 
-  // ignore: missing_return
   Icon getIconWidget() {
     switch (type) {
       case SharedItemType.VIDEO:

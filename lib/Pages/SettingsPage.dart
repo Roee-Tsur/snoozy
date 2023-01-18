@@ -2,7 +2,7 @@ import 'dart:core';
 
 import 'package:flutter/material.dart';
 import 'package:snozzy/CustomWidgets/MainDrawer.dart';
-import 'package:snozzy/CustomWidgets/TimePickerDialogNew.dart' as TPD;
+import 'package:snozzy/CustomWidgets/TimePickerDialog.dart' as TPD;
 import 'package:snozzy/Globals.dart';
 import 'package:snozzy/models/SnoozyTypes.dart';
 
@@ -170,32 +170,3 @@ class _EditTimeOptionCardState extends State<EditTimeOptionCard> {
     );
   }
 }
-
-/*class LeaveAppOpenAfterShareWidget extends StatefulWidget {
-  SharedPreferences sharedPreferences;
-
-  LeaveAppOpenAfterShareWidget(this.sharedPreferences);
-
-  _LeaveAppOpenAfterShareWidgetState createState() =>
-      _LeaveAppOpenAfterShareWidgetState();
-}
-
-class _LeaveAppOpenAfterShareWidgetState
-    extends State<LeaveAppOpenAfterShareWidget> {
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      title: Text('Leave the app open after adding a new item'),
-      trailing: Switch(
-        onChanged: (value) {
-          widget.sharedPreferences.setBool('leaveAppOpenAfterShare', value);
-          setState(() {});
-        },
-        value: widget.sharedPreferences.containsKey('leaveAppOpenAfterShare')
-            ? widget.sharedPreferences.getBool('leaveAppOpenAfterShare')!
-            : true,
-      ),
-    );
-  }
-}
-*/

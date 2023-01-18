@@ -62,6 +62,5 @@ extension AutoDeleteHistoryTypeExtension on AutoDeleteHistoryType {
       case AutoDeleteHistoryType.one_week:
         return Duration(days: 7);
     }
-    return null;
   }
 }

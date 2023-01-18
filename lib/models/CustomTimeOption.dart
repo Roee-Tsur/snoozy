@@ -5,7 +5,6 @@ part 'CustomTimeOption.g.dart';
 
 @HiveType(typeId: 8)
 class CustomTimeOption extends HiveObject {
-  //String iconName;
   @HiveField(0)
   late String id;
   @HiveField(1)

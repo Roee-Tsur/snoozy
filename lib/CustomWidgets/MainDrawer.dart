@@ -73,12 +73,6 @@ class MainDrawer extends StatelessWidget {
                   Analytics.setCurrentScreen('SettingsPage');
                 }),
           ),
-          /*InkWell(
-            child: ListTile(
-              title: Text('Review Us'),
-              //onTap: () => Navigator.push(context, HistoryPage),
-            ),
-          )*/
         ],
       ),
     );

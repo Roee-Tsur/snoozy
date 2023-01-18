@@ -1,447 +1,519 @@
-// import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
-// import 'package:flutter/cupertino.dart';
-// import 'package:flutter/material.dart';
-// import 'package:flutter/widgets.dart';
-// import 'package:flutter_picker/Picker.dart';
-// import 'package:fluttertoast/fluttertoast.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
-// import 'package:snozzy/Globals.dart';
-// import 'package:intl/intl.dart';
-//
-// class ReminderTimeDialog extends StatefulWidget {
-//   _ReminderTimeDialogState createState() => _ReminderTimeDialogState();
-// }
-//
-// class _ReminderTimeDialogState extends State<ReminderTimeDialog> {
-//   SharedPreferences sharedPreferences;
-//   TimeOfDay time;
-//   String selectedTile;
-//
-//   setSelectedTile(String tile) {
-//     setState(() {
-//       selectedTile = tile;
-//     });
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Dialog(
-//         elevation: 12,
-//         child: FutureBuilder(
-//             future: SharedPreferences.getInstance(),
-//             builder:
-//                 // ignore: missing_return
-//                 (BuildContext context, AsyncSnapshot<SharedPreferences> value) {
-//               if (value.connectionState == ConnectionState.waiting)
-//                 return CircularProgressIndicator();
-//               if (value.connectionState == ConnectionState.done) {
-//                 sharedPreferences = value.data;
-//                 Map<String, dynamic> savedValues = getSavedValues();
-//                 time = stringToTimeOfDay(savedValues['timeOfDay']);
-//                 return StatefulBuilder(
-//                   builder: (innerContext, setInnerState) => Column(
-//                     mainAxisSize: MainAxisSize.min,
-//                     children: [
-//                       Container(
-//                           child: Column(
-//                         children: [
-//                           Padding(
-//                             padding: const EdgeInsets.only(bottom: 8.0),
-//                             child: Text(
-//                               "When do you want to be snoozed?",
-//                               style: TextStyle(fontSize: 18),
-//                               textAlign: TextAlign.center,
-//                             ),
-//                           ),
-//                           _OptionListTile(
-//                             type: 'minutes',
-//                             selectedTile: selectedTile,
-//                             onChanged: (tile) =>
-//                                 setInnerState(() => selectedTile = tile),
-//                             onEditIconTaped: () async => await setNewTimeDialog(
-//                                 context,
-//                                 'minutes',
-//                                 getSavedValues()['minutes'],
-//                                 60),
-//                             title: Text(
-//                               "In " +
-//                                   savedValues['minutes'].toString() +
-//                                   " minute" +
-//                                   (savedValues['minutes'] != 1 ? 's' : ''),
-//                             ),
-//                           ),
-//                           _OptionListTile(
-//                             type: 'hours',
-//                             selectedTile: selectedTile,
-//                             title: Text(
-//                               "In " +
-//                                   savedValues['hours'].toString() +
-//                                   " hour" +
-//                                   (savedValues['hours'] != 1 ? 's' : ''),
-//                             ),
-//                             onEditIconTaped: () async => await setNewTimeDialog(
-//                                 context,
-//                                 'hours',
-//                                 getSavedValues()['hours'],
-//                                 24),
-//                             onChanged: (tile) =>
-//                                 setInnerState(() => selectedTile = tile),
-//                           ),
-//                           _OptionListTile(
-//                             onChanged: (tile) =>
-//                                 setInnerState(() => selectedTile = tile),
-//                             onEditIconTaped: () async => await setNewTimeDialog(
-//                                 context, 'days', getSavedValues()['days'], 31),
-//                             title: Text(
-//                               (savedValues['days'] != 1
-//                                   ? "In " +
-//                                       savedValues['days'].toString() +
-//                                       " days"
-//                                   : 'Tomorrow at this time'),
-//                             ),
-//                             selectedTile: selectedTile,
-//                             type: 'days',
-//                           ),
-//                           RadioListTile(
-//                               value: 'timeOfDay',
-//                               groupValue: selectedTile,
-//                               selected: 'timeOfDay' == selectedTile,
-//                               onChanged: (tile) =>
-//                                   setInnerState(() => selectedTile = tile),
-//                               title: Text(
-//                                 "At ${savedValues['timeOfDay']}",
-//                               ),
-//                               secondary: Padding(
-//                                 padding: EdgeInsets.only(left: 20),
-//                                 child: SizedBox(
-//                                   width: 35,
-//                                   height: 35,
-//                                   child: DateTimeField(
-//                                       format: DateFormat("HH:mm"),
-//                                       decoration: InputDecoration(
-//                                           icon: Icon(Icons.edit)),
-//                                       onShowPicker:
-//                                           // ignore: missing_return
-//                                           (context, currentValue) async {
-//                                         time = await showTimePicker(
-//                                           context: context,
-//                                           initialTime: TimeOfDay.now(),
-//                                         );
-//                                         if (time != null) saveTimeOfDay(time);
-//                                       }),
-//                                 ),
-//                               )),
-//                           _OptionListTile(
-//                               title: Text('Save without a reminder'),
-//                               selectedTile: selectedTile,
-//                               onChanged: (tile) =>
-//                                   setInnerState(() => selectedTile = tile),
-//                               type: 'noReminder'),
-//                           TextButton(
-//                               child: Text(
-//                                 "Custom time",
-//                                 style: TextStyle(color: Globals.textBlack),
-//                               ),
-//                               onPressed: () async {
-//                                 DateTime reminderTime = await showDialog(
-//                                     barrierColor: Colors.black.withOpacity(.75),
-//                                     context: context,
-//                                     builder: (BuildContext context) =>
-//                                         CustomDateTimePickerDialog());
-//                                 if (reminderTime != null)
-//                                   Navigator.pop(context, reminderTime);
-//                               }),
-//                           Row(
-//                             mainAxisAlignment: MainAxisAlignment.end,
-//                             children: [
-//                               TextButton(
-//                                 child: Text(
-//                                   'save',
-//                                   style: TextStyle(color: Globals.snoozyPurple),
-//                                 ),
-//                                 onPressed: () {
-//                                   if (selectedTile == null) {
-//                                     Fluttertoast.showToast(
-//                                         msg: 'please select a reminder option');
-//                                     return;
-//                                   }
-//                                   return saveTime(savedValues[selectedTile],
-//                                       selectedTile, context);
-//                                 },
-//                               ),
-//                             ],
-//                           )
-//                         ],
-//                       )),
-//                     ],
-//                   ),
-//                 );
-//               }
-//             }));
-//   }
-//
-//   saveTime(savedValue, String type, BuildContext context) {
-//     DateTime reminderTime = DateTime.now();
-//     switch (type) {
-//       case ('minutes'):
-//         reminderTime = reminderTime.add(Duration(minutes: savedValue));
-//         break;
-//       case ('hours'):
-//         reminderTime = reminderTime.add(Duration(hours: savedValue));
-//         break;
-//       case ('days'):
-//         reminderTime = reminderTime.add(Duration(days: savedValue));
-//         break;
-//       case ('timeOfDay'):
-//         savedValue = stringToTimeOfDay(savedValue);
-//         reminderTime = combineDateAndTime(reminderTime, savedValue);
-//         print(reminderTime);
-//         if (!isInFuture(reminderTime))
-//           reminderTime = reminderTime.add(Duration(days: 1));
-//         break;
-//       case ('noReminder'):
-//         reminderTime = null;
-//         break;
-//     }
-//     Navigator.pop(context, reminderTime);
-//   }
-//
-//   void saveTimeOfDay(TimeOfDay time) {
-//     String stringTime = '${time.hour}:${time.minute}';
-//     if (time.minute < 10) stringTime = stringTime.replaceFirst(':', ':0');
-//     sharedPreferences.setString('timeOfDay', stringTime);
-//     setState(() {});
-//   }
-//
-//   TimeOfDay stringToTimeOfDay(String timeString) {
-//     int hours = int.parse(timeString.split(':')[0]);
-//     int minutes = int.parse(timeString.split(':')[1]);
-//     return TimeOfDay(minute: minutes, hour: hours);
-//   }
-//
-//   Map<String, dynamic> getSavedValues() {
-//     Map<String, dynamic> savedValues = Map<String, dynamic>();
-//
-//     if (!sharedPreferences.containsKey('minutes'))
-//       sharedPreferences.setInt('minutes', 15);
-//     savedValues['minutes'] = sharedPreferences.getInt('minutes');
-//
-//     if (!sharedPreferences.containsKey('hours'))
-//       sharedPreferences.setInt('hours', 2);
-//     savedValues['hours'] = sharedPreferences.getInt('hours');
-//
-//     if (!sharedPreferences.containsKey('days'))
-//       sharedPreferences.setInt('days', 1);
-//     savedValues['days'] = sharedPreferences.getInt('days');
-//
-//     if (!sharedPreferences.containsKey('timeOfDay'))
-//       sharedPreferences.setString('timeOfDay', '20:00');
-//     savedValues['timeOfDay'] = sharedPreferences.getString('timeOfDay');
-//
-//     return savedValues;
-//   }
-//
-//   void setNewTimeDialog(
-//       BuildContext context, String type, int oldValue, numOfOptions) async {
-//     Picker(
-//         adapter: PickerDataAdapter<String>(
-//           pickerdata: getPickerData(type, numOfOptions),
-//         ),
-//         onConfirm: (picker, list) {
-//           String value = picker.adapter.text;
-//           int newValue;
-//           if (value == null)
-//             newValue = getSavedValues()[type];
-//           else
-//             newValue = int.parse(value[1]);
-//           sharedPreferences.setInt(type, newValue);
-//           setState(() {});
-//         }).showModal(context);
-//   }
-//
-//   List<String> getPickerData(String type, int numOfOptions) {
-//     List<String> pickerData = [];
-//
-//     String firstValue = '1 $type'.substring(0, type.length + 1);
-//     pickerData.add(firstValue);
-//     for (int i = 2; i <= numOfOptions; i++) {
-//       pickerData.add(i.toString() + ' ' + type);
-//     }
-//
-//     return pickerData;
-//   }
-// }
-//
-// class _OptionListTile extends StatelessWidget {
-//   String type, selectedTile;
-//   Function onChanged, onEditIconTaped;
-//   Text title;
-//
-//   _OptionListTile(
-//       {this.type,
-//       this.selectedTile,
-//       this.onChanged,
-//       this.onEditIconTaped,
-//       this.title});
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return RadioListTile(
-//         value: type,
-//         groupValue: selectedTile,
-//         onChanged: onChanged,
-//         selected: type == selectedTile,
-//         title: title,
-//         secondary: onEditIconTaped != null
-//             ? IconButton(
-//                 icon: Icon(Icons.edit),
-//                 onPressed: onEditIconTaped,
-//               )
-//             : null);
-//   }
-// }
-//
-// class _EditTimeDialog extends StatelessWidget {
-//   String type;
-//   int value;
-//
-//   _EditTimeDialog(this.type, this.value);
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Dialog(
-//         elevation: 18,
-//         child: Container(
-//           padding: EdgeInsets.all(4),
-//           child: Row(
-//             children: [
-//               Expanded(
-//                 child: SizedBox(
-//                   width: 280,
-//                   child: TextField(
-//                     keyboardType: TextInputType.number,
-//                     decoration: InputDecoration(
-//                       border: OutlineInputBorder(),
-//                       labelText: 'Enter $type',
-//                     ),
-//                     onChanged: (str) => value = int.parse(str),
-//                   ),
-//                 ),
-//               ),
-//               IconButton(
-//                 icon: Icon(Icons.check),
-//                 onPressed: () {
-//                   if (value > 0)
-//                     Navigator.pop(context, value);
-//                   else
-//                     ; //toast about not zero
-//                 },
-//               )
-//             ],
-//           ),
-//         ));
-//   }
-// }
-//
-// class CustomDateTimePickerDialog extends StatefulWidget {
-//   TimeOfDay time = TimeOfDay.now();
-//   DateTime date = DateTime.now();
-//
-//   _CustomDateTimePickerDialogState createState() =>
-//       _CustomDateTimePickerDialogState();
-// }
-//
-// class _CustomDateTimePickerDialogState
-//     extends State<CustomDateTimePickerDialog> {
-//   DateTime reminderTime;
-//   TimeOfDay time;
-//   DateTime date;
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     time = widget.time;
-//     date = widget.date;
-//     return Dialog(
-//       elevation: 18,
-//       child: Container(
-//         child: Column(
-//           mainAxisSize: MainAxisSize.min,
-//           children: [
-//             Column(children: [
-//               DateTimeField(
-//                   format: DateFormat("yyyy-MM-dd"),
-//                   initialValue: date,
-//                   decoration: InputDecoration(
-//                       labelStyle: TextStyle(),
-//                       labelText: 'Click to enter date',
-//                       icon: Icon(Icons.calendar_today)),
-//                   onSaved: (savedDate) {
-//                     date = savedDate;
-//                   },
-//                   onShowPicker: (context, currentValue) async {
-//                     date = await showDatePicker(
-//                         context: context,
-//                         firstDate: DateTime.now(),
-//                         initialDate: currentValue ?? DateTime.now(),
-//                         lastDate: DateTime(2100));
-//                     if (date == null) date = DateTime.now();
-//                     reminderTime = combineDateAndTime(date, time);
-//                     return date;
-//                   }),
-//               DateTimeField(
-//                   format: DateFormat("HH:mm"),
-//                   initialValue: date,
-//                   decoration: InputDecoration(
-//                       labelText: 'Click to enter time',
-//                       icon: Icon(Icons.access_time_outlined)),
-//                   onShowPicker: (context, currentValue) async {
-//                     time = await showTimePicker(
-//                       context: context,
-//                       initialTime: TimeOfDay.fromDateTime(
-//                           currentValue ?? DateTime.now()),
-//                     );
-//                     if (time == null) time = TimeOfDay.now();
-//                     reminderTime = combineDateAndTime(date, time);
-//                     return DateTimeField.convert(time);
-//                   }),
-//               Row(
-//                 mainAxisAlignment: MainAxisAlignment.end,
-//                 children: [
-//                   TextButton(
-//                     onPressed: () => Navigator.pop(context, null),
-//                     child: Text(
-//                       'Cancel',
-//                       style: TextStyle(color: Colors.redAccent),
-//                     ),
-//                   ),
-//                   TextButton(
-//                     onPressed: () {
-//                       if (isInFuture(reminderTime))
-//                         Navigator.pop(context, reminderTime);
-//                       else
-//                         Fluttertoast.showToast(
-//                             msg: 'please select a time in the future');
-//                       //else
-//                     },
-//                     child: Text(
-//                       'Done',
-//                       style: TextStyle(color: Colors.green),
-//                     ),
-//                   )
-//                 ],
-//               )
-//             ]),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-//
-// DateTime combineDateAndTime(DateTime dateTime, TimeOfDay timeOfDay) {
-//   return DateTimeField.combine(dateTime, timeOfDay);
-// }
-//
-// bool isInFuture(DateTime date) {
-//   return date.isAfter(DateTime.now());
-// }
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:snozzy/Globals.dart';
+import 'package:intl/intl.dart';
+import 'package:snozzy/models/CustomTimeOption.dart';
+import 'package:snozzy/models/SnoozyTypes.dart';
+import 'package:snozzy/services/Database.dart';
+
+import '../services/SPService.dart';
+
+class TimePickerDialog extends StatefulWidget {
+  bool isSettings = false;
+
+  TimePickerDialog({bool? isSettings}) {
+    if (isSettings != null) this.isSettings = isSettings;
+  }
+
+  _TimePickerDialogState createState() => _TimePickerDialogState();
+}
+
+class _TimePickerDialogState extends State<TimePickerDialog> {
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      elevation: 12,
+      child: SingleChildScrollView(
+        child: Padding(
+          padding:
+              const EdgeInsets.only(top: 15, bottom: 15, left: 25.0, right: 25),
+          child: GridView.count(
+            physics: ScrollPhysics(),
+            shrinkWrap: true,
+            crossAxisCount: 2,
+            children:
+                widget.isSettings ? getSettingsTimeOptions() : getTimeOptions(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<Widget> getTimeOptions() {
+    final now = DateTime.now();
+    _TimeOption tomorrowMorning = _TimeOption(
+        icon: Icons.wb_sunny,
+        title: 'Tomorrow morning',
+        subTitle: '${weekdayToString[now.weekday + 1]} 8:00',
+        value: combineDateAndTime(
+            now.add(Duration(days: 1)), TimeOfDay(minute: 0, hour: 8)),
+        onTap: (value, context) => save(value, context));
+
+    _TimeOption thisAfternoon = _TimeOption(
+        icon: FontAwesomeIcons.mugHot,
+        title: 'This afternoon',
+        subTitle: '13:00',
+        value: combineDateAndTime(now, TimeOfDay(minute: 0, hour: 13)),
+        onTap: (value, context) => save(value, context));
+
+    _TimeOption thisEvening = _TimeOption(
+        icon: FontAwesomeIcons.wineGlass,
+        title: 'This evening',
+        subTitle: '19:00',
+        value: combineDateAndTime(now, TimeOfDay(minute: 0, hour: 19)),
+        onTap: (value, context) => save(value, context));
+
+    final workWeek = SPService().currentWorkWeekType;
+    _TimeOption thisWeekend = _TimeOption(
+        icon: Icons.weekend,
+        title: 'This weekend',
+        subTitle: '${workWeek.thisWeekendShortName} 10:00',
+        value: setDayOfTheWeek(now, workWeek.thisWeekendDay, 10),
+        onTap: (value, context) => save(value, context));
+
+    _TimeOption nextWeek = _TimeOption(
+        icon: Icons.next_week,
+        title: 'Next week',
+        subTitle: '${workWeek.nextWeekShortName} 8:00',
+        value: setDayOfTheWeek(now, workWeek.nextWeekDay, 8),
+        onTap: (value, context) => save(value, context));
+
+    Widget addCustomTimeOption = InkWell(
+        onTap: () async {
+          DateTime value = await showDialog(
+              context: context,
+              builder: (BuildContext context) => CustomDateTimePickerDialog());
+          Navigator.pop(context, value);
+        },
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.date_range,
+                color: Globals.snoozyPurple,
+              ),
+              ListTile(
+                title: Text(
+                  'Custom day & time',
+                  textAlign: TextAlign.center,
+                ),
+              )
+            ],
+          ),
+        ));
+
+    Widget addNewTimeOption = InkWell(
+      onTap: () async {
+        final CustomTimeOption results = await showDialog(
+            context: context,
+            builder: (BuildContext context) => CustomTimeOptionDialog());
+        setState(() {
+          Database.addTimeOption(results);
+        });
+      },
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.add,
+              color: Globals.snoozyPurple,
+            ),
+            ListTile(
+              title: Text(
+                'Add a new option',
+                textAlign: TextAlign.center,
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+
+    List<Widget> timeOptions = [];
+    timeOptions.add(tomorrowMorning);
+
+    //shows option only before the after noon
+    if (now.hour < 13) timeOptions.add(thisAfternoon);
+
+    //shows option only before the evening
+    if (now.hour < 19) timeOptions.add(thisEvening);
+
+    //shows option only when its now the the weekend days
+    if (!workWeek.isWeekendNow) timeOptions.add(thisWeekend);
+
+    timeOptions.add(nextWeek);
+    final customOptionsModels = Database.getTimeOptions();
+    timeOptions.addAll(List.generate(
+        customOptionsModels.length,
+        (index) =>
+            _TimeOption.fromCustomTimeOption(customOptionsModels[index], () {
+              setState(() {
+                Database.deleteTimeOption(customOptionsModels[index].id);
+              });
+            })));
+    timeOptions.add(addCustomTimeOption);
+    timeOptions.add(addNewTimeOption);
+    return timeOptions;
+  }
+
+  List<Widget> getSettingsTimeOptions() {
+    Widget addNewTimeOption = InkWell(
+      onTap: () async {
+        final CustomTimeOption results = await showDialog(
+            context: context,
+            builder: (BuildContext context) => CustomTimeOptionDialog());
+        setState(() {
+          Database.addTimeOption(results);
+        });
+      },
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.add,
+              color: Globals.snoozyPurple,
+            ),
+            ListTile(
+              title: Text(
+                'Add a new option',
+                textAlign: TextAlign.center,
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+
+    List<Widget> timeOptions = [];
+    final customOptionsModels = Database.getTimeOptions();
+
+    timeOptions.addAll(List.generate(
+        customOptionsModels.length,
+        (index) => _TimeOption.fromCustomTimeOption(
+              customOptionsModels[index],
+              () {
+                setState(() {
+                  Database.deleteTimeOption(customOptionsModels[index].id);
+                });
+              },
+              isSettings: true,
+            )));
+    timeOptions.add(addNewTimeOption);
+    return timeOptions;
+  }
+
+  static Map<int, String> weekdayToString = {
+    1: 'Mon',
+    2: 'Tue',
+    3: 'Wed',
+    4: 'Thu',
+    5: 'Fri',
+    6: 'Sat',
+    7: 'Sun',
+    8: 'Mon'
+  };
+
+  static DateTime setDayOfTheWeek(DateTime now, int day, int hour) {
+    now = combineDateAndTime(now, TimeOfDay(hour: hour, minute: 0));
+    if (now.weekday == day) now.add(Duration(days: 7));
+    if (now.weekday >= day) day += 7;
+    return now.add(Duration(days: (day - now.weekday).abs()));
+  }
+}
+
+class _TimeOption extends StatelessWidget {
+  late final String title, subTitle;
+  late final IconData icon;
+  late final DateTime value;
+  late final Function onTap;
+  String? customId;
+  Function? onDelete;
+
+  _TimeOption(
+      {required this.title,
+      required this.subTitle,
+      required this.icon,
+      required this.onTap,
+      required this.value});
+
+  _TimeOption.fromCustomTimeOption(
+      CustomTimeOption customTimeOption, Function onDelete,
+      {bool? isSettings}) {
+    this.title = customTimeOption.title;
+    this.subTitle = customTimeOption.subTitle;
+    this.icon = Icons.star;
+    this.value = DateTime.now().add(Duration(
+        hours: customTimeOption.hours, minutes: customTimeOption.minutes));
+    this.onTap = (value, context) {
+      if (isSettings != null && isSettings) return;
+      save(value, context);
+    };
+    this.customId = customTimeOption.id;
+    this.onDelete = onDelete;
+  }
+
+  @override
+  Widget build(BuildContext context) => InkWell(
+      onTap: () => onTap(value, context),
+      child: Stack(
+        children: [
+          customId != null
+              ? Align(
+                  alignment: Alignment.topRight,
+                  child: IconButton(
+                      onPressed: () => onDelete!.call(),
+                      icon: Icon(Icons.close)),
+                )
+              : Container(),
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  color: Globals.snoozyPurple,
+                ),
+                ListTile(
+                  title: Text(
+                    title,
+                    textAlign: TextAlign.center,
+                  ),
+                  subtitle: Text(subTitle, textAlign: TextAlign.center),
+                )
+              ],
+            ),
+          ),
+        ],
+      ));
+}
+
+class CustomDateTimePickerDialog extends StatefulWidget {
+  _CustomDateTimePickerDialogState createState() =>
+      _CustomDateTimePickerDialogState();
+}
+
+class _CustomDateTimePickerDialogState
+    extends State<CustomDateTimePickerDialog> {
+  DateTime? reminderTime;
+  TimeOfDay? time = TimeOfDay.now();
+  DateTime? date = DateTime.now();
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      elevation: 18,
+      child: Container(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            DateTimeField(
+                format: DateFormat("yyyy-MM-dd"),
+                initialValue: date,
+                decoration: InputDecoration(
+                    labelStyle: TextStyle(),
+                    labelText: 'Click to enter date',
+                    icon: Icon(Icons.calendar_today)),
+                onSaved: (savedDate) {
+                  date = savedDate;
+                },
+                onShowPicker: (context, currentValue) async {
+                  date = await showDatePicker(
+                      context: context,
+                      firstDate: DateTime.now(),
+                      initialDate: currentValue ?? DateTime.now(),
+                      lastDate: DateTime(2100));
+                  if (date == null) date = DateTime.now();
+                  reminderTime = combineDateAndTime(date!, time!);
+                  return date;
+                }),
+            DateTimeField(
+                format: DateFormat("HH:mm"),
+                initialValue: date,
+                decoration: InputDecoration(
+                    labelText: 'Click to enter time',
+                    icon: Icon(Icons.access_time_outlined)),
+                onShowPicker: (context, currentValue) async {
+                  time = await showTimePicker(
+                    context: context,
+                    initialTime:
+                        TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
+                  );
+                  if (time == null) time = TimeOfDay.now();
+                  reminderTime = combineDateAndTime(date!, time!);
+                  return DateTimeField.convert(time);
+                }),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, null),
+                  child: Text(
+                    'Cancel',
+                    style: TextStyle(color: Colors.redAccent),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    if (isInFuture(reminderTime!))
+                      Navigator.pop(context, reminderTime);
+                    else
+                      Fluttertoast.showToast(
+                          msg: 'please select a time in the future');
+                    //else
+                  },
+                  child: Text(
+                    'Done',
+                    style: TextStyle(color: Colors.green),
+                  ),
+                )
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class CustomTimeOptionDialog extends StatefulWidget {
+  CustomTimeOptionDialog({Key? key}) : super(key: key);
+
+  @override
+  State<CustomTimeOptionDialog> createState() => _CustomTimeOptionDialogState();
+}
+
+class _CustomTimeOptionDialogState extends State<CustomTimeOptionDialog> {
+  final _hoursController = TextEditingController(),
+      _minutesController = TextEditingController(),
+      _titleController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+        child: Padding(
+      padding: const EdgeInsets.all(12),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("enter desired time to be snoozed",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            Container(
+              height: 8,
+            ),
+            TextFormField(
+              controller: _titleController,
+              decoration: InputDecoration(
+                  labelText: "option title", border: OutlineInputBorder()),
+              validator: (value) {
+                if (value == null || value.isEmpty)
+                  return "please enter a title";
+                return null;
+              },
+            ),
+            Container(
+              height: 8,
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                      controller: _hoursController,
+                      decoration: InputDecoration(
+                          hintText: "0",
+                          labelText: "hours",
+                          border: OutlineInputBorder()),
+                      keyboardType: TextInputType.numberWithOptions(
+                          decimal: false, signed: false),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) value = "0";
+                        int intValue = int.parse(value);
+                        if (intValue < 0) {
+                          return "please enter a positive number";
+                        }
+                        return null;
+                      }),
+                ),
+                Container(
+                  width: 8,
+                ),
+                Expanded(
+                  child: TextFormField(
+                      controller: _minutesController,
+                      decoration: InputDecoration(
+                          hintText: "0",
+                          labelText: "minutes",
+                          border: OutlineInputBorder()),
+                      keyboardType: TextInputType.numberWithOptions(
+                          decimal: false, signed: false),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) value = "0";
+                        int intValue = int.parse(value);
+                        if (intValue < 0) {
+                          return "please enter a positive number";
+                        }
+                        return null;
+                      }),
+                ),
+              ],
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      int? hours = int.tryParse(_hoursController.text);
+                      hours ??= 0;
+                      int? minutes = int.tryParse(_minutesController.text);
+                      minutes ??= 0;
+                      if (hours == 0 && minutes == 0) {
+                        Fluttertoast.showToast(
+                            msg: "please fill the hours or minutes field");
+                        return;
+                      }
+                      Navigator.pop(
+                          context,
+                          CustomTimeOption(
+                              title: _titleController.text,
+                              subTitle: getSubtitle(hours, minutes),
+                              hours: hours,
+                              minutes: minutes));
+                    }
+                  },
+                  child: Text(
+                    "save",
+                    style: TextStyle(color: Colors.green),
+                  )),
+            )
+          ],
+        ),
+      ),
+    ));
+  }
+
+  String getSubtitle(int hours, int minutes) {
+    if (minutes == 0 && hours == 0) return 'now';
+    if (minutes == 0) return "in $hours hours";
+    if (hours == 0) return "in $minutes minutes";
+    return "in $hours hours and $minutes minutes";
+  }
+}
+
+DateTime combineDateAndTime(DateTime dateTime, TimeOfDay timeOfDay) {
+  return DateTimeField.combine(dateTime, timeOfDay);
+}
+
+bool isInFuture(DateTime date) {
+  return date.isAfter(DateTime.now());
+}
+
+void save(DateTime value, BuildContext context) =>
+    Navigator.pop(context, value);

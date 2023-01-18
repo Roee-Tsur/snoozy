@@ -12,8 +12,6 @@ class Analytics {
   static setCurrentScreen(String screenName) =>
       _fireBaseAnalytics.setCurrentScreen(screenName: screenName);
 
-  //static search(String searchTerm) => _fireBaseAnalytics.logSearch(searchTerm: searchTerm);
-
   static notificationClicked(String itemType) =>
       _newEvent(name: 'notification_clicked', parameters: {'item_type': itemType});
 

@@ -11,7 +11,7 @@ import 'package:snozzy/CustomWidgets/GlobalWidgets.dart';
 
 import 'package:snozzy/CustomWidgets/ItemWidget.dart';
 import 'package:snozzy/CustomWidgets/MainDrawer.dart';
-import 'package:snozzy/CustomWidgets/TimePickerDialogNew.dart' as mDialog;
+import 'package:snozzy/CustomWidgets/TimePickerDialog.dart' as mDialog;
 import 'package:snozzy/Globals.dart';
 import 'package:snozzy/models/FileItem.dart';
 import 'package:snozzy/models/ImageItem.dart';
@@ -48,10 +48,6 @@ class MainListPageState extends State<MainListPage> {
   @override
   void initState() {
     super.initState();
-
-    //Ads.displayBannerAd(context);
-
-    //isFirstTimeOpeningApp = isFirstTimer();
 
     searchController.addListener(() {
       setState(() {
@@ -115,11 +111,6 @@ class MainListPageState extends State<MainListPage> {
     await getReminderTimeFromUser().then((value) async {
       sharedItem.setReminderTime(value);
       setState(() {});
-      /*await SharedPreferences.getInstance().then((value) {
-        if (!value.containsKey('leaveAppOpenAfterShare') ||
-            !value.getBool('leaveAppOpenAfterShare'))
-          SystemChannels.platform.invokeMethod('SystemNavigator.pop');
-      });*/
     });
     Analytics.itemCreated(sharedItem.type.toString());
     ReceiveSharingIntent.reset();
@@ -245,43 +236,6 @@ class MainListPageState extends State<MainListPage> {
         ),
       );
 
-  /*Widget snoozedItemsTab() {
-    List itemsList = Database.getAllItemsInBox(Database.snoozedList);
-    String state = isSnoozedTabOpen ? 'Hide' : 'Show';
-    return Column(
-      children: [
-        FlatButton(
-            onPressed: () {
-              isSnoozedTabOpen = !isSnoozedTabOpen;
-              state = isSnoozedTabOpen ? 'Hide' : 'Show';
-              setState(() {});
-            },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.access_alarm),
-                Text('$state snoozed items (${itemsList.length})')
-              ],
-            )),
-        isSnoozedTabOpen
-            ? ListView.builder(
-                shrinkWrap: true,
-                itemCount: itemsList.length,
-                itemBuilder: (BuildContext context, int index) {
-                  dynamic currItem = itemsList[index];
-                  if (itemsList.isEmpty)
-                    return Text('no items');
-                  else
-                    return makeItemCard(currItem);
-                })
-            : Container(
-                width: 0,
-                height: 0,
-              )
-      ],
-    );
-  }*/
-
   Widget getItemWidget(SharedItem sharedItem) {
     String? videoDuration;
     Image? imageWidget;
@@ -328,7 +282,6 @@ class MainListPageState extends State<MainListPage> {
     );
   }
 
-  // .\n\n when ever you want to set a reminder for anything on your phone just share it to Snoozy and it will appear here!"
   Widget emptyListTextWidget() => Center(
           child: InkWell(
         onTap: () => addNewItemDialog(),
@@ -369,16 +322,6 @@ class MainListPageState extends State<MainListPage> {
               createItemFromText: createItemFromTextField);
         });
   }
-
-  // bool isFirstTimer()  {
-  //   SharedPreferences.getInstance().then((value) {
-  //     if (value.getBool('firstTimeOpeningApp') == null) {
-  //       value.setBool('firstTimeOpeningApp', false);
-  //       return true;
-  //     } else
-  //       return false;
-  //   }).then((value) => value);
-  // }
 
   void createItemFromFilePicker(String? path) async {
     if (path == null || path.isEmpty) return;
@@ -424,10 +367,6 @@ class MainListPageState extends State<MainListPage> {
                 textAlign: TextAlign.center,
               ),
               actions: [
-                /*TextButton(
-                    onPressed: () => handleNewSharedItem(
-                        'https://play.google.com/store/apps/details?id=surk.inc.snoozy'),
-                    child: Text('Later')),*/
                 TextButton(
                     onPressed: () => Navigator.pop(context),
                     child: Text(

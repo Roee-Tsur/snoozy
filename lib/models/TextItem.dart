@@ -5,7 +5,7 @@ part 'TextItem.g.dart';
 
 @HiveType(typeId: 3)
 class TextItem extends SharedItem {
-  static final int MAX_NUMBER_OF_CHARS_IN_DESCRIPTION = 50;
+  static const int MAX_NUMBER_OF_CHARS_IN_DESCRIPTION = 50;
 
   @HiveField(4)
   late String text;
